@@ -1,30 +1,29 @@
-# Gitlab Runner
+# 🚀 Мой Backend Проект с GitHub CI
 
-### Запуск раннера
-```
-docker run -d --name gitlab-runner --restart always \
-  -v /srv/gitlab-runner/config:/etc/gitlab-runner \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  gitlab/gitlab-runner:alpine
+Репозиторий включает в себя автоматизированный пайплайн тестирования (CI/CD) на базе **GitHub Actions** и контейнеризацию через **Docker**.
+
+## 🛠 Автоматизация (CI/CD)
+
+В проекте настроен непрерывный запуск тестов при каждом обновлении кода. Пайплайн описан в файле `.github/workflows/ci.yml`.
+
+### Что делает GitHub Actions при каждом `git push`:
+1. **Выделяет сервер:** GitHub автоматически запускает чистую виртуальную машину на базе Ubuntu Linux.
+2. **Скачивает код:** Копирует актуальное состояние ветки `master` на этот сервер.
+3. **Собирает контейнер:** Создает Docker-образ приложения на основе локального `Dockerfile`.
+4. **Запускает тесты:** Внутри собранного Docker-образа автоматически выполняется команда тестирования `pytest`.
+
+Статус сборки (зеленая галочка или красный крестик) можно отслеживать во вкладке **Actions** в меню репозитория.
+
+## 🐳 Локальный запуск через Docker
+
+Если вы хотите собрать образ и запустить тесты вручную на своем компьютере, выполните следующие команды в терминале:
+
+### Сборка Docker-образа
+```bash
+docker build -t my-backend-image .
 ```
 
-### Регистрация раннера
-```
-docker run --rm -it \
-    -v /srv/gitlab-runner/config:/etc/gitlab-runner \
-    gitlab/gitlab-runner:alpine register
-```
-
-### Изменение конфига
-#### Шаг 1
-Заходим в режим редактирования конфига через        
-`nano /srv/gitlab-runner/config/config.toml`        
-или     
-`vim /srv/gitlab-runner/config/config.toml`
-
-#### Шаг 2
-Меняем      
-`volumes = ["/cache"]` на
-```
-volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
+### Запуск тестов внутри контейнера
+```bash
+docker run --rm my-backend-image pytest -s -v
 ```
